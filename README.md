@@ -17,6 +17,9 @@ overlay
 # Run the terminal trainer in manual mode (press 0-7 to view layers)
 trainer
 
+# Build firmware (requires Docker)
+build
+
 # Flash firmware (keyboard must be in DFU mode)
 flash
 ```
@@ -41,15 +44,21 @@ This uses the standard [Miryoku](https://github.com/manna-harbour/miryoku) layou
 ```
 szr35-miryoku/
 ├── firmware/
-│   ├── keymap.c               # QMK keymap with layer broadcast + RGB
-│   └── szrkbd_szr35_vial.bin  # Compiled firmware
+│   └── szrkbd_szr35_vial.bin     # Compiled firmware (ready to flash)
 ├── layouts/
-│   └── miryoku-kbd-layout.vil # Miryoku layout for Vial (split_3x5_3)
+│   └── miryoku-kbd-layout.vil    # Miryoku layout for Vial (split_3x5_3)
 ├── overlay/
-│   ├── miryoku_overlay.py     # GUI layer overlay (PyQt6)
-│   ├── miryoku_trainer.py     # Terminal layer trainer (Rich)
-│   └── hid_test.py            # HID debug tool
-├── flake.nix                  # Nix flake for dependencies
+│   ├── miryoku_overlay.py        # GUI layer overlay (PyQt6)
+│   └── miryoku_trainer.py        # Terminal layer trainer (Rich)
+├── qmk/
+│   └── szrkbd/szr35/             # QMK keyboard definition
+│       ├── keyboard.json         # Keyboard config (matrix, RGB, split)
+│       └── keymaps/vial/
+│           ├── keymap.c          # Miryoku keymap + layer broadcast + RGB
+│           ├── rules.mk          # Build features (RAW_ENABLE, etc.)
+│           └── vial.json         # Vial layout definition
+├── build.sh                      # Docker build script
+├── flake.nix                     # Nix flake for dependencies
 └── README.md
 ```
 
@@ -99,24 +108,38 @@ The keymap.c provides the base firmware with layer broadcast and RGB support. Th
 
 ## Building Firmware
 
-To rebuild firmware with changes:
+Requirements:
+- Docker installed and running
+- `vial-qmk` with SZR35 keyboard at `/home/draxel/Downloads/vial-qmk-szr35`
 
 ```bash
-build  # Uses Docker to compile QMK firmware
+# Build using Docker
+./build.sh
+
+# Or in nix develop shell
+build
 ```
 
-This requires:
-- Docker installed
-- vial-qmk source with SZR35 keyboard definition
+The build script:
+1. Copies `qmk/szrkbd/szr35/keymaps/vial/keymap.c` to vial-qmk
+2. Runs `make szrkbd/szr35:vial` in Docker
+3. Copies compiled `.bin` to `firmware/`
 
-The build command runs:
+### Making it Fully Self-Contained
+
+To make this repo fully self-contained, clone vial-qmk as a submodule:
+
 ```bash
-docker run --rm -v /path/to/vial-qmk:/qmk_firmware qmkfm/qmk_cli:latest make szrkbd/szr35:vial
+git submodule add https://github.com/vial-kb/vial-qmk.git vial-qmk
+cp -r qmk/szrkbd vial-qmk/keyboards/
+# Update build.sh VIAL_QMK path
 ```
 
-### Firmware Source
+## Firmware Features
 
-The keymap.c in `firmware/` includes:
-- Layer broadcast over Raw HID (for overlay communication)
-- RGB Matrix layer indication (different colors per layer)
-- Base keymap (actual layout comes from Vial/VIL file)
+The keymap.c includes:
+- **9 Miryoku layers**: BASE (Colemak-DH), NAV, MOUSE, MEDIA, NUM, SYM, FUN, BUTTON, + transparent
+- **Home row mods**: GUI/Alt/Ctrl/Shift on home row for each hand
+- **Raw HID layer broadcast**: Sends layer changes to overlay/trainer
+- **RGB per-finger colors**: On base layer, each finger has a unique color
+- **RGB layer colors**: Different color per layer when not on base
