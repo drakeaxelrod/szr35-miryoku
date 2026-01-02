@@ -2,6 +2,8 @@
 
 Complete setup for the SZR35 split keyboard with Miryoku layout, RGB layer indication, layer broadcasting, and Vial support.
 
+![Miryoku Layout](miryoku-kle-cover-miryoku_qmk.png)
+
 ## Quick Start
 
 ```bash
@@ -159,13 +161,6 @@ If trainer/overlay can't access keyboard:
 fix-hid        # Quick fix (temporary)
 ```
 
-For permanent fix:
-
-```bash
-echo 'SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3601", ATTRS{idProduct}=="45d4", MODE="0666"' | sudo tee /etc/udev/rules.d/99-szr35.rules
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
-
 ## Firmware Features
 
 ### RGB Layer Indication
@@ -231,6 +226,18 @@ This allows overlay/trainer to show current layer automatically.
 1. Make sure Docker is running: `docker ps`
 2. Check disk space (vial-qmk needs ~500MB)
 3. Clear cache and retry: `rm -rf ~/.cache/szr35-vial-qmk`
+
+## Credits & Inspiration
+
+This project builds upon the work of several amazing open-source projects:
+
+- **[Miryoku](https://github.com/manna-harbour/miryoku)** by Manna Harbour - The ergonomic keyboard layout system this firmware implements
+- **[Miryoku QMK](https://github.com/manna-harbour/miryoku_qmk)** - Reference Miryoku implementation for QMK
+- **[Vial](https://get.vial.today/)** - Real-time keyboard configuration
+- **[Vial QMK](https://github.com/vial-kb/vial-qmk)** - QMK fork with Vial support
+- **[QMK Firmware](https://github.com/qmk/qmk_firmware)** - The keyboard firmware framework
+
+Layout visualization from [Miryoku KLE](https://github.com/manna-harbour/miryoku/tree/master/docs/reference).
 
 ## License
 
