@@ -48,7 +48,7 @@
             alias trainer="python $PWD/overlay/miryoku_trainer.py"
             alias trainer-hid="python $PWD/overlay/miryoku_trainer.py --hid"
             alias flash="sudo dfu-util -a 0 -s 0x08000000:leave -D firmware/szrkbd_szr35_vial.bin"
-            alias build="docker run --rm -v /home/draxel/Downloads/vial-qmk-szr35:/qmk_firmware -w /qmk_firmware qmkfm/qmk_cli:latest make szrkbd/szr35:vial && cp /home/draxel/Downloads/vial-qmk-szr35/szrkbd_szr35_vial.bin $PWD/firmware/"
+            alias build="$PWD/build.sh"
           '';
         };
 
