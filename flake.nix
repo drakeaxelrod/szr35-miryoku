@@ -107,10 +107,6 @@
           echo "Setting HID permissions for SZR35..."
           sudo chmod 666 /dev/hidraw*
           echo "Done! Overlay/trainer should now work."
-          echo ""
-          echo "For permanent fix, add udev rule:"
-          echo '  echo '\''SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3601", ATTRS{idProduct}=="45d4", MODE="0666"'\'' | sudo tee /etc/udev/rules.d/99-szr35.rules'
-          echo "  sudo udevadm control --reload-rules && sudo udevadm trigger"
         '';
 
       in {
